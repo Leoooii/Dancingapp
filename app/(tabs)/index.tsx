@@ -1,121 +1,43 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
-import { Client, Account, ID, Models } from 'react-native-appwrite';
-import React, { useState } from 'react';
-
-let client: Client;
-let account: Account;
-
-client = new Client();
-client
-    .setEndpoint('https://cloud.appwrite.io/v1')
-    .setProject('6789192f000b9938672f')
-    // .setPlatform('com.lione.inpasidedans');  // Your package name / bundle identifier
-
-account = new Account(client);
-export default function App() {
-    const [loggedInUser, setLoggedInUser] = useState<Models.User<Models.Preferences> | null>(null);
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [name, setName] = useState('');
-
-    async function login(email: string, password: string) {
-        console.log(email, password, 'pressed');
-        try {
-            const response = await account.createEmailPasswordSession(email, password);
-            console.log('Session created:', response);  // Debugging log
-            setLoggedInUser(await account.get());
-        } catch (error) {
-            console.error('Login error:', error);  // Capturing and logging any error
-        }
-    }
+import React from 'react';
+import {View, Text, Button, ImageBackground,StyleSheet} from 'react-native';
+import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
+import '../../global.css'
+import { router} from "expo-router";
 
 
-    async function register(email: string, password: string, name: string) {
-        console.log(email, password, name, 'register pressed');  // Debugging log
-        try {
-            const response = await account.create(ID.unique(), email, password, name);
-            console.log('Account created:', response);  // Log when account creation is successful
-            await login(email, password);  // Login immediately after registration
-        } catch (error) {
-            console.error('Register error:', error);  // Log any error encountered
-        }
-    }
+const IndexScreen=()=>{
+    const image = {uri: 'https://www.inpasidedans.ro/wp-content/uploads/2016/07/logo-in-pasi-de-dans.png'};
 
-    return (
-        <View style={styles.root}>
-            <Text>
-                {loggedInUser ? `Logged in as ${loggedInUser.name}` : 'Not logged in'}
-            </Text>
-            <View>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Email"
-                    value={email}
-                    onChangeText={(text) => setEmail(text)}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Password"
-                    value={password}
-                    onChangeText={(text) => setPassword(text)}
-                    secureTextEntry
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Name"
-                    value={name}
-                    onChangeText={(text) => setName(text)}
-                />
+    return  <SafeAreaProvider>
+        <SafeAreaView style={styles.container} edges={['left', 'right']} className={'p-10'}>
+            <ImageBackground source={image} resizeMode="contain" style={styles.image} className={'p-10'}>
+                <Text style={styles.text}>In pasi de dans!</Text>
+                <View className={'flex flex-row gap-2 justify-center'} >
+                    <Button title={'Intrare in cont'} onPress={()=>{router.push('/(tabs)/auth')}} color={'red'} />
 
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => login(email, password)}
-                >
-                    <Text>Login</Text>
-                </TouchableOpacity>
 
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={()=> register(email, password, name)}
-                >
-                    <Text>Register</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={async () => {
-                        await account.deleteSession('current');
-                        setLoggedInUser(null);
-                    }}
-                >
-                    <Text>Logout</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
-
-    );
+                </View>
+            </ImageBackground>
+        </SafeAreaView>
+    </SafeAreaProvider>
 }
-
 const styles = StyleSheet.create({
-    root: {
-        marginTop: 40,
-        marginBottom: 40,
-        backgroundColor:'orange'
+    container: {
+        flex: 1,
     },
-    input: {
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
-        marginBottom: 10,
-        paddingHorizontal: 10,
+    image: {
+        flex: 1,
+        justifyContent: 'space-around',
+        // backgroundColor:'blue'
     },
-    button: {
-        backgroundColor: 'gray',
-        padding: 10,
-        marginBottom: 10,
-        alignItems: 'center',
+    text: {
+        color: 'white',
+        fontSize: 42,
+        lineHeight: 84,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        // backgroundColor: '#000000c0',
     },
 });
 
-
+export default IndexScreen;  // Exportă componenta corect
